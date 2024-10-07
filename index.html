@@ -159,41 +159,54 @@
             });
         }
 
-        function showRegisterForm() {
-            setContent(`
-                <h2>Inscription</h2>
-                <form id="registerForm">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Mot de passe</label>
-                        <input type="password" class="form-control" id="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">S'inscrire</button>
-                </form>
-            `);
+       function showRegisterForm() {
+    setContent(`
+        <h2>Inscription</h2>
+        <form id="registerForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label">Rôle</label>
+                <select class="form-select" id="role" required>
+                    <option value="utilisateur">Utilisateur</option>
+                    <option value="admin">Administrateur</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">S'inscrire</button>
+        </form>
+    `);
 
-            document.getElementById('registerForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value; // Récupérer le rôle
 
-                try {
-                    await axios.post(`${apiBaseUrl}/utilisateurs/register`, { nom: name, email, motDePasse: password });
-                    alert('Inscription réussie. Veuillez vous connecter.');
-                    showLoginForm();
-                } catch (error) {
-                    alert('Erreur d\'inscription');
-                }
+        try {
+            const response = await fetch(`${apiBaseUrl}/utilisateurs/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, motDePasse: password, role }) // Inclure le rôle
             });
+            const data = await response.json();
+            if (response.ok) {
+                alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                showLoginForm();
+            } else {
+                alert(data.message || 'Erreur lors de l\'inscription');
+            }
+        } catch (error) {
+            console.error('Erreur lors de l\'inscription:', error);
+            alert('Erreur d\'inscription');
         }
+    });
+}
 
         async function showDashboard() {
             try {
